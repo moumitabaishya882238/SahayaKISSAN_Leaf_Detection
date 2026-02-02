@@ -1,0 +1,153 @@
+.sensor-card {
+  width: 240px;
+  height: 140px;
+  padding: 24px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 
+    0 8px 24px rgba(0,0,0,0.08),
+    0 2px 8px rgba(0,0,0,0.04);
+  backdrop-filter: blur(10px);
+}
+
+.sensor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 16px 40px rgba(0,0,0,0.12),
+    0 4px 16px rgba(0,0,0,0.08);
+}
+
+.sensor-card--safe {
+  background: hsl(140, 40%, 97%);
+  border: 2px solid hsl(140, 50%, 85%);
+}
+
+.sensor-card--warning {
+  background: hsl(50, 100%, 94%);
+  border: 2px solid hsl(50, 90%, 85%);
+}
+
+.sensor-card--danger {
+  background: hsl(355, 86%, 95%);
+  border: 2px solid hsl(355, 75%, 85%);
+}
+
+.sensor-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.sensor-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sensor-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a3a2a;
+  letter-spacing: -0.01em;
+}
+
+.sensor-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.value-number {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  color: #2d1b0f;
+  letter-spacing: -0.03em;
+}
+
+.value-unit {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b553f;
+}
+
+.sensor-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sensor-card--safe .status-indicator {
+  background: #28a745;
+  box-shadow: 0 0 12px rgba(40, 167, 69, 0.4);
+}
+
+.sensor-card--warning .status-indicator {
+  background: #ffc107;
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+}
+
+.sensor-card--danger .status-indicator {
+  background: #dc3545;
+  box-shadow: 0 0 12px rgba(220, 53, 69, 0.4);
+}
+
+.status-text {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sensor-card--safe .status-text { color: hsl(140, 40%, 25%); }
+.sensor-card--warning .status-text { color: hsl(50, 60%, 30%); }
+.sensor-card--danger .status-text { color: hsl(355, 60%, 35%); }
+
+/* Corner decoration - agricultural texture */
+.sensor-card::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 30% 30%, rgba(248, 215, 160, 0.3) 0%, transparent 50%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.sensor-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sensor-card {
+    width: 100%;
+    max-width: 280px;
+    height: 120px;
+    padding: 20px;
+  }
+  
+  .value-number {
+    font-size: 32px;
+  }
+}
