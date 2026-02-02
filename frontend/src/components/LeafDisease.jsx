@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./LeafDisease.css";
+import { calculateSeverity, getAdvisory } from "../utils/severityCalculator";
 
 export default function LeafDisease() {
   const [mode, setMode] = useState("upload");
@@ -9,10 +10,36 @@ export default function LeafDisease() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [sensorData, setSensorData] = useState(null);
+  const [severity, setSeverity] = useState(null);
+  const [advisory, setAdvisory] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Fetch sensor data on component mount and periodically
+  useEffect(() => {
+    const fetchSensorData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api-sensor/sensor-data",
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setSensorData(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch sensor data:", err);
+      }
+    };
+
+    fetchSensorData();
+    const interval = setInterval(fetchSensorData, 10000); // Refresh every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (mode !== "camera") {
@@ -115,6 +142,8 @@ export default function LeafDisease() {
 
     setError(null);
     setResult(null);
+    setSeverity(null);
+    setAdvisory(null);
     setScanning(true);
     setLoading(true);
 
@@ -144,6 +173,17 @@ export default function LeafDisease() {
       }
 
       setResult(data);
+
+      // Calculate severity based on prediction and sensor data
+      const calculatedSeverity = calculateSeverity(data.label, sensorData);
+      setSeverity(calculatedSeverity);
+
+      // Get advisory based on disease and severity
+      const advisoryData = getAdvisory(data.label, calculatedSeverity);
+      setAdvisory(advisoryData);
+
+      // Speak the advisory recommendations
+      speakAdvisory(advisoryData, data.label, calculatedSeverity);
     } catch (err) {
       setError(err.message || "Prediction failed");
     } finally {
@@ -152,12 +192,60 @@ export default function LeafDisease() {
     }
   };
 
+  const speakAdvisory = (advisoryData, diseaseLabel, severityLevel) => {
+    if (!advisoryData || !window.speechSynthesis) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    // Prepare the text to speak
+    const diseaseName = diseaseLabel.replace(/_/g, " ");
+    const severityText =
+      severityLevel === "LOW"
+        ? "low"
+        : severityLevel === "MEDIUM"
+          ? "medium"
+          : "high";
+
+    let textToSpeak = `Prediction complete. Disease detected: ${diseaseName}. Severity level: ${severityText}. `;
+    textToSpeak += `Recommended actions: `;
+
+    advisoryData.actions.forEach((action, index) => {
+      textToSpeak += `${index + 1}. ${action}. `;
+    });
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
+
+  const replaySpeech = () => {
+    if (advisory && result && severity) {
+      speakAdvisory(advisory, result.label, severity);
+    }
+  };
+
   const resetSelection = () => {
     setImageFile(null);
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
     setResult(null);
+    setSeverity(null);
+    setAdvisory(null);
     setError(null);
+    stopSpeaking();
     // If in camera mode, the camera will automatically restart due to the useEffect
   };
 
@@ -170,6 +258,33 @@ export default function LeafDisease() {
           photo.
         </p>
       </header>
+
+      {/* Sensor Data Panel */}
+      {sensorData && (
+        <div className="sensor-data-panel">
+          <h3 className="sensor-data__title">📊 Live Sensor Data</h3>
+          <div className="sensor-data__grid">
+            <div className="sensor-item">
+              <span className="sensor-label">🌡️ Temperature</span>
+              <span className="sensor-value">
+                {sensorData.temperature?.toFixed(1) || "N/A"}°C
+              </span>
+            </div>
+            <div className="sensor-item">
+              <span className="sensor-label">💧 Humidity</span>
+              <span className="sensor-value">
+                {sensorData.humidity?.toFixed(1) || "N/A"}%
+              </span>
+            </div>
+            <div className="sensor-item">
+              <span className="sensor-label">🌱 Soil Moisture</span>
+              <span className="sensor-value">
+                {sensorData.soil_moisture?.toFixed(1) || "N/A"}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="leaf-disease__card">
         <div className="leaf-disease__options">
@@ -263,15 +378,63 @@ export default function LeafDisease() {
 
             {error && <div className="error-text">{error}</div>}
 
+            {/* Prediction Result */}
             {result && (
               <div className="result-card">
-                <div className="result-title">Prediction</div>
-                <div className="result-value">{result.label}</div>
+                <div className="result-title">🔍 Prediction</div>
+                <div className="result-value">
+                  {result.label.replace(/_/g, " ")}
+                </div>
                 {result.confidence !== undefined && (
                   <div className="result-sub">
                     Confidence: {(result.confidence * 100).toFixed(2)}%
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Severity Level */}
+            {severity && (
+              <div className="severity-card">
+                <div className="severity-badge">
+                  {getAdvisory(result.label, severity).severity}
+                </div>
+              </div>
+            )}
+
+            {/* Advisory Recommendations */}
+            {advisory && (
+              <div className="advisory-card">
+                <div className="advisory-header">
+                  <span className="advisory-emoji">{advisory.emoji}</span>
+                  <h4 className="advisory-title">{advisory.title}</h4>
+                </div>
+                <ul className="advisory-actions">
+                  {advisory.actions.map((action, index) => (
+                    <li key={index} className="action-item">
+                      ✔ {action}
+                    </li>
+                  ))}
+                </ul>
+                <div className="voice-controls">
+                  {isSpeaking ? (
+                    <button
+                      className="voice-button stop"
+                      onClick={stopSpeaking}
+                      title="Stop voice"
+                    >
+                      🔇 Stop Voice
+                    </button>
+                  ) : (
+                    <button
+                      className="voice-button replay"
+                      onClick={replaySpeech}
+                      title="Replay advisory"
+                    >
+                      🔊 Replay Advisory
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
