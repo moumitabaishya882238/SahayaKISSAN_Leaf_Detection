@@ -22,11 +22,17 @@
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: 24px;
-  padding: 32px 36px;
+  padding: clamp(20px, 4vw, 36px);
   margin-bottom: 32px;
   box-shadow: 0 20px 45px var(--panel-shadow);
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-header:hover {
+  box-shadow: 0 25px 55px var(--panel-shadow);
+  transform: translateY(-2px);
 }
 
 .dashboard-header::before {
@@ -110,14 +116,15 @@
   background: var(--panel-bg);
   border: 1px solid var(--border-accent);
   border-radius: 20px;
-  padding: 24px;
+  padding: clamp(16px, 3vw, 24px);
   display: flex;
   align-items: flex-start;
   gap: 16px;
   box-shadow: 0 12px 28px var(--panel-shadow);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .sensor-card::before {
@@ -130,15 +137,21 @@
 }
 
 .sensor-card:hover {
-  transform: translateY(-6px) scale(1.02);
+  transform: translateY(-8px) scale(1.03);
   box-shadow:
-    0 20px 40px var(--panel-shadow),
-    0 0 30px var(--glow-soft);
-  border-color: var(--border-accent);
+    0 25px 50px var(--panel-shadow),
+    0 0 40px var(--glow-soft);
+  border-color: var(--border-strong);
 }
 
-.sensor-card:hover::before {
+.sensor-card:hover::before,
+.sensor-card:focus-within::before {
   opacity: 1;
+}
+
+.sensor-card:focus-within {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
 }
 
 .sensor-card:hover .card-icon {

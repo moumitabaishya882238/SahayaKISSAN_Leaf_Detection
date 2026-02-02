@@ -174,16 +174,52 @@ export default function LeafDisease() {
 
       setResult(data);
 
-      // Calculate severity based on prediction and sensor data
-      const calculatedSeverity = calculateSeverity(data.label, sensorData);
-      setSeverity(calculatedSeverity);
+      // Fetch latest sensor data after disease detection
+      try {
+        const sensorResponse = await fetch(
+          "http://localhost:5000/api-sensor/sensor-data",
+        );
+        if (sensorResponse.ok) {
+          const latestSensorData = await sensorResponse.json();
+          setSensorData(latestSensorData);
 
-      // Get advisory based on disease and severity
-      const advisoryData = getAdvisory(data.label, calculatedSeverity);
-      setAdvisory(advisoryData);
+          // Calculate severity with the latest sensor data
+          const calculatedSeverity = calculateSeverity(
+            data.label,
+            latestSensorData,
+          );
+          setSeverity(calculatedSeverity);
 
-      // Speak the advisory recommendations
-      speakAdvisory(advisoryData, data.label, calculatedSeverity);
+          // Get advisory based on disease and severity
+          const advisoryData = getAdvisory(data.label, calculatedSeverity);
+          setAdvisory(advisoryData);
+
+          // Speak the advisory recommendations
+          speakAdvisory(advisoryData, data.label, calculatedSeverity);
+        } else {
+          // Fallback to existing sensor data if fetch fails
+          const calculatedSeverity = calculateSeverity(data.label, sensorData);
+          setSeverity(calculatedSeverity);
+
+          const advisoryData = getAdvisory(data.label, calculatedSeverity);
+          setAdvisory(advisoryData);
+
+          speakAdvisory(advisoryData, data.label, calculatedSeverity);
+        }
+      } catch (sensorErr) {
+        console.warn(
+          "Failed to fetch sensor data after prediction:",
+          sensorErr,
+        );
+        // Fallback to existing sensor data
+        const calculatedSeverity = calculateSeverity(data.label, sensorData);
+        setSeverity(calculatedSeverity);
+
+        const advisoryData = getAdvisory(data.label, calculatedSeverity);
+        setAdvisory(advisoryData);
+
+        speakAdvisory(advisoryData, data.label, calculatedSeverity);
+      }
     } catch (err) {
       setError(err.message || "Prediction failed");
     } finally {

@@ -35,9 +35,16 @@
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: 24px;
-  padding: 32px 36px;
+  padding: clamp(20px, 4vw, 36px);
   box-shadow: 0 20px 45px var(--panel-shadow);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.leaf-disease__card:hover {
+  box-shadow: 0 25px 55px var(--panel-shadow);
+  transform: translateY(-2px);
 }
 
 .leaf-disease__options {
@@ -55,14 +62,31 @@
   color: var(--btn-secondary-text);
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.option-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--panel-shadow);
+  border-color: var(--border-strong);
+}
+
+.option-button:focus {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
+.option-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .option-button.active {
   background: var(--bg-card-hover);
   color: var(--text-accent);
   border-color: var(--text-accent);
-  box-shadow: 0 8px 16px var(--glow-soft);
+  box-shadow: 0 8px 20px var(--glow-soft);
+  transform: scale(1.02);
 }
 
 .option-button:disabled {
