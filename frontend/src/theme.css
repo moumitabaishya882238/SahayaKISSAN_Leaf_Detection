@@ -1,0 +1,151 @@
+/* ============================================
+   CSS VARIABLES FOR THEME SWITCHING
+   ============================================ */
+
+:root[data-theme="dark"] {
+  /* Background Colors */
+  --bg-primary: radial-gradient(
+    circle at top right,
+    #1a3828 0%,
+    #0a0f0c 45%,
+    #050705 100%
+  );
+  --bg-card: linear-gradient(
+    135deg,
+    rgba(76, 158, 106, 0.2),
+    rgba(48, 85, 66, 0.35)
+  );
+  --bg-card-hover: rgba(76, 158, 106, 0.3);
+  --bg-solid: rgba(18, 28, 22, 0.85);
+  --bg-overlay: rgba(8, 14, 10, 0.95);
+
+  /* Text Colors */
+  --text-primary: #e6f4ea;
+  --text-secondary: rgba(214, 233, 218, 0.75);
+  --text-tertiary: rgba(214, 233, 218, 0.6);
+  --text-muted: rgba(214, 233, 218, 0.55);
+  --text-accent: #7ee39c;
+  --text-title: #7ee39c;
+  --text-white: #ffffff;
+
+  /* Border Colors */
+  --border-primary: rgba(112, 160, 122, 0.25);
+  --border-accent: rgba(126, 227, 156, 0.3);
+  --border-strong: rgba(126, 227, 156, 0.6);
+  --border-info: rgba(126, 227, 156, 0.4);
+
+  /* Button Colors */
+  --btn-primary-bg: linear-gradient(135deg, #4c9e6a 0%, #3a7a52 100%);
+  --btn-primary-shadow: rgba(76, 158, 106, 0.3);
+  --btn-secondary-bg: rgba(76, 158, 106, 0.15);
+  --btn-secondary-text: #7ee39c;
+
+  /* Panel Colors */
+  --panel-bg: rgba(10, 15, 12, 0.8);
+  --panel-border: rgba(112, 160, 122, 0.2);
+  --panel-shadow: rgba(2, 10, 6, 0.3);
+
+  /* Glow Effects */
+  --glow-primary: rgba(126, 227, 156, 0.8);
+  --glow-soft: rgba(126, 227, 156, 0.2);
+  --glow-icon: rgba(126, 227, 156, 0.3);
+
+  /* Status Colors */
+  --status-critical-bg: rgba(255, 50, 50, 0.9);
+  --status-critical-border: rgba(255, 50, 50, 1);
+  --status-high-bg: rgba(255, 129, 129, 0.85);
+  --status-high-border: rgba(255, 129, 129, 1);
+  --status-warning-bg: rgba(255, 201, 137, 0.85);
+  --status-warning-text: #2a1a0a;
+  --status-warning-border: rgba(255, 201, 137, 1);
+  --status-low-bg: rgba(137, 179, 255, 0.75);
+  --status-low-text: #0a1a2a;
+  --status-low-border: rgba(137, 179, 255, 1);
+
+  /* Info Icon */
+  --info-bg: rgba(126, 227, 156, 0.2);
+  --info-border: rgba(126, 227, 156, 0.4);
+  --info-text: #7ee39c;
+  --info-bg-hover: rgba(126, 227, 156, 0.35);
+  --info-border-hover: rgba(126, 227, 156, 0.7);
+
+  /* Chart Colors */
+  --chart-grid: rgba(126, 227, 156, 0.15);
+  --chart-text: rgba(214, 233, 218, 0.7);
+  --chart-tooltip-bg: rgba(18, 28, 22, 0.98);
+  --chart-tooltip-border: rgba(126, 227, 156, 0.4);
+}
+
+:root[data-theme="light"] {
+  /* Background Colors */
+  --bg-primary: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: rgba(200, 230, 210, 0.6);
+  --bg-solid: rgba(255, 255, 255, 0.95);
+  --bg-overlay: rgba(255, 255, 255, 0.98);
+
+  /* Text Colors */
+  --text-primary: #1b4d3e;
+  --text-secondary: #4a7c59;
+  --text-tertiary: #6b9d7a;
+  --text-muted: #8bb399;
+  --text-accent: #2e7d54;
+  --text-title: #2e7d54;
+  --text-white: #ffffff;
+
+  /* Border Colors */
+  --border-primary: rgba(76, 158, 106, 0.3);
+  --border-accent: rgba(46, 125, 84, 0.4);
+  --border-strong: rgba(46, 125, 84, 0.7);
+  --border-info: rgba(76, 175, 80, 0.5);
+
+  /* Button Colors */
+  --btn-primary-bg: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  --btn-primary-shadow: rgba(76, 175, 80, 0.3);
+  --btn-secondary-bg: rgba(76, 175, 80, 0.1);
+  --btn-secondary-text: #2e7d54;
+
+  /* Panel Colors */
+  --panel-bg: rgba(255, 255, 255, 0.95);
+  --panel-border: rgba(76, 158, 106, 0.25);
+  --panel-shadow: rgba(0, 0, 0, 0.08);
+
+  /* Glow Effects */
+  --glow-primary: rgba(76, 175, 80, 0.6);
+  --glow-soft: rgba(76, 175, 80, 0.15);
+  --glow-icon: rgba(76, 175, 80, 0.3);
+
+  /* Status Colors */
+  --status-critical-bg: rgba(244, 67, 54, 0.9);
+  --status-critical-border: rgba(211, 47, 47, 1);
+  --status-high-bg: rgba(255, 152, 0, 0.85);
+  --status-high-border: rgba(245, 124, 0, 1);
+  --status-warning-bg: rgba(255, 235, 59, 0.85);
+  --status-warning-text: #5d4e0a;
+  --status-warning-border: rgba(253, 216, 53, 1);
+  --status-low-bg: rgba(33, 150, 243, 0.75);
+  --status-low-text: #0d3a5f;
+  --status-low-border: rgba(25, 118, 210, 1);
+
+  /* Info Icon */
+  --info-bg: rgba(76, 175, 80, 0.15);
+  --info-border: rgba(76, 175, 80, 0.4);
+  --info-text: #2e7d54;
+  --info-bg-hover: rgba(46, 125, 84, 0.25);
+  --info-border-hover: rgba(46, 125, 84, 0.8);
+
+  /* Chart Colors */
+  --chart-grid: rgba(76, 158, 106, 0.15);
+  --chart-text: rgba(27, 77, 62, 0.7);
+  --chart-tooltip-bg: rgba(255, 255, 255, 0.98);
+  --chart-tooltip-border: rgba(76, 175, 80, 0.4);
+}
+
+/* Apply theme variables globally */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}

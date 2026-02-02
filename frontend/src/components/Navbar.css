@@ -1,0 +1,131 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-primary);
+  box-shadow: 0 4px 16px var(--panel-shadow);
+  z-index: 1000;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.navbar-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-accent);
+}
+
+.navbar-link:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--panel-shadow);
+  border-color: var(--border-strong);
+}
+
+.navbar-link:active {
+  transform: translateY(0);
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle {
+  padding: 8px 12px;
+  font-size: 20px;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+  background: var(--bg-card-hover);
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 4px 12px var(--panel-shadow);
+  border-color: var(--border-strong);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.logo-icon {
+  font-size: 28px;
+  animation: leafFloat 3s ease-in-out infinite;
+}
+
+.logo-text {
+  background: var(--btn-primary-bg);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes leafFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .navbar-links {
+    gap: 12px;
+  }
+
+  .navbar-link {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+  }
+
+  .logo-icon {
+    font-size: 24px;
+  }
+}

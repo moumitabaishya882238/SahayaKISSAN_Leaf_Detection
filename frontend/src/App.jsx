@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 import Layout from "./components/Layout";
 import LeafDisease from "./components/LeafDisease";
@@ -8,7 +9,7 @@ import Splash from "./components/Splash";
 
 function App() {
   return (
-    <>
+    <ThemeProvider>
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route element={<Layout />}>
@@ -17,7 +18,7 @@ function App() {
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-    </>
+    </ThemeProvider>
   );
 }
 
