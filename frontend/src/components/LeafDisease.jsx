@@ -134,63 +134,85 @@ export default function LeafDisease() {
     }, "image/jpeg");
   };
 
-  const handleScan = async () => {
-    if (!imageFile) {
-      setError("Please select or capture a leaf image first.");
-      return;
+ const handleScan = async () => {
+  if (!imageFile) {
+    setError("Please select or capture a leaf image first.");
+    return;
+  }
+
+  setError(null);
+  setResult(null);
+  setSeverity(null);
+  setAdvisory(null);
+  setScanning(true);
+  setLoading(true);
+
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  try {
+    // ================= AI PREDICTION =================
+    const response = await fetch("http://localhost:5000/api/leaf/predict", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Prediction failed");
     }
 
-    setError(null);
-    setResult(null);
-    setSeverity(null);
-    setAdvisory(null);
-    setScanning(true);
-    setLoading(true);
+    const data = await response.json();
 
-    const formData = new FormData();
-    formData.append("image", imageFile);
+    if (data.error) {
+      throw new Error(data.message || "Invalid leaf image");
+    }
+
+    setResult(data);
+
+    // ================= ESP32 LIVE SENSOR FETCH =================
+    let liveSensorData;
 
     try {
-      const [response] = await Promise.all([
-        fetch("http://localhost:5000/api/leaf/predict", {
-          method: "POST",
-          body: formData,
-        }),
-        new Promise((resolve) => setTimeout(resolve, 1200)),
-      ]);
+      const espResponse = await fetch(
+  "http://localhost:5000/api-sensor/sensor-live"
+);
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        const errorMessage = data.message || data.error || "Prediction failed";
-        throw new Error(errorMessage);
+
+      if (!espResponse.ok) {
+        throw new Error("ESP32 not responding");
       }
 
-      const data = await response.json();
-
-      // Check if backend returned an error in the response
-      if (data.error) {
-        throw new Error(data.message || "Please enter a valid leaf image");
-      }
-
-      setResult(data);
-
-      // Calculate severity based on prediction and sensor data
-      const calculatedSeverity = calculateSeverity(data.label, sensorData);
-      setSeverity(calculatedSeverity);
-
-      // Get advisory based on disease and severity
-      const advisoryData = getAdvisory(data.label, calculatedSeverity);
-      setAdvisory(advisoryData);
-
-      // Speak the advisory recommendations
-      speakAdvisory(advisoryData, data.label, calculatedSeverity);
+      liveSensorData = await espResponse.json();
     } catch (err) {
-      setError(err.message || "Prediction failed");
-    } finally {
+      setError("❌ Failed to fetch live sensor data from IoT device");
       setLoading(false);
       setScanning(false);
+      return; // ⛔ STOP HERE
     }
-  };
+
+    // ================= SEVERITY + ADVISORY =================
+    const calculatedSeverity = calculateSeverity(
+      data.label,
+      liveSensorData
+    );
+
+    setSeverity(calculatedSeverity);
+
+    const advisoryData = getAdvisory(
+      data.label,
+      calculatedSeverity
+    );
+
+    setAdvisory(advisoryData);
+    speakAdvisory(advisoryData, data.label, calculatedSeverity);
+
+  } catch (err) {
+    setError(err.message || "Prediction failed");
+  } finally {
+    setLoading(false);
+    setScanning(false);
+  }
+};
 
   const speakAdvisory = (advisoryData, diseaseLabel, severityLevel) => {
     if (!advisoryData || !window.speechSynthesis) return;

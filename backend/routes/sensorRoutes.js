@@ -58,5 +58,25 @@ router.get("/sensor-history", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch sensor history" });
   }
 });
+// GET: LIVE SENSOR DATA FOR AI SEVERITY
+router.get("/sensor-live", async (req, res) => {
+  try {
+    const latest = await SensorData.findOne().sort({ timestamp: -1 });
+
+    if (!latest) {
+      return res.status(404).json({ error: "No sensor data available" });
+    }
+
+    // Optional freshness check (10 sec)
+    const age = Date.now() - new Date(latest.timestamp).getTime();
+    if (age > 15000) {
+      return res.status(503).json({ error: "Sensor offline" });
+    }
+
+    res.status(200).json(latest);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch live sensor data" });
+  }
+});
 
 module.exports = router;

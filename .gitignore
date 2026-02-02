@@ -81,3 +81,4 @@ Thumbs.db
 *.sln
 *.sw?
 
+/venv
