@@ -47,10 +47,21 @@ export default function LeafDisease() {
       return;
     }
 
+    // Reset preview when switching to camera mode
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
+    setImageFile(null);
+
     const startCamera = async () => {
       try {
+        // Stop any existing stream first
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
         streamRef.current = stream;
@@ -59,6 +70,7 @@ export default function LeafDisease() {
         }
       } catch (err) {
         setError("Unable to access camera. Please allow camera permissions.");
+        console.error("Camera error:", err);
       }
     };
 
