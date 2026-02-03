@@ -24,6 +24,21 @@ export default function SensorDashboard() {
   const [latestData, setLatestData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [iotConnected, setIotConnected] = useState(false);
+  const [lastSeen, setLastSeen] = useState(null);
+
+  const formatLastSeen = (timestamp) => {
+    if (!timestamp) return "Never";
+    const time = new Date(timestamp);
+    if (Number.isNaN(time.getTime())) return "Unknown";
+    const diffSeconds = Math.floor((Date.now() - time.getTime()) / 1000);
+    if (diffSeconds < 60) return `${diffSeconds}s ago`;
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return time.toLocaleString();
+  };
 
   // Fetch sensor data from backend
   const fetchSensorData = async () => {
@@ -51,6 +66,15 @@ export default function SensorDashboard() {
       const latest = formatted[formatted.length - 1] || {};
       setLatestData(latest);
 
+      if (latest?.timestamp) {
+        setLastSeen(latest.timestamp);
+        const ageSeconds =
+          (Date.now() - new Date(latest.timestamp).getTime()) / 1000;
+        setIotConnected(ageSeconds < 30);
+      } else {
+        setIotConnected(false);
+      }
+
       // Check thresholds and show alerts
       if (Object.keys(latest).length > 0) {
         checkDiseaseRisk(latest);
@@ -63,6 +87,7 @@ export default function SensorDashboard() {
       setError(
         "Failed to load sensor data. Please check if the backend is running.",
       );
+      setIotConnected(false);
       setLoading(false);
     }
   };
@@ -414,43 +439,42 @@ export default function SensorDashboard() {
         </div>
       )}
 
-      {/* Error State */}
-      {error && !loading && (
-        <div style={{ textAlign: "center", padding: "60px" }}>
-          <div
-            style={{
-              background: "rgba(239, 68, 68, 0.1)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              borderRadius: "12px",
-              padding: "24px",
-              color: "#fca5a5",
-              maxWidth: "600px",
-              margin: "0 auto",
-            }}
-          >
-            <h2>⚠️ Connection Error</h2>
-            <p>{error}</p>
-            <button
-              onClick={fetchSensorData}
-              style={{
-                marginTop: "16px",
-                padding: "12px 24px",
-                background: "#22c55e",
-                color: "#fff",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontWeight: "600",
-              }}
-            >
-              Retry Connection
-            </button>
+      {/* Offline / Locked State */}
+      {!loading && !iotConnected && (
+        <div className="dashboard-lock">
+          <div className="offline-card">
+            <div className="offline-header">
+              <span className="offline-badge">Device Offline</span>
+              <h2>⚠️ Please connect to ESP32</h2>
+              <p>
+                Live sensor data is unavailable. Connect the IoT device to
+                unlock the dashboard.
+              </p>
+            </div>
+            <div className="offline-details">
+              <div>
+                <span className="detail-label">Last seen:</span>
+                <span className="detail-value">{formatLastSeen(lastSeen)}</span>
+              </div>
+              {error && <div className="detail-error">{error}</div>}
+            </div>
+            <div className="offline-actions">
+              <button className="offline-button" onClick={fetchSensorData}>
+                Retry Connection
+              </button>
+              <button
+                className="offline-button ghost"
+                onClick={() => window.location.reload()}
+              >
+                Refresh Page
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Main Dashboard - Only show when data is loaded */}
-      {!loading && !error && (
+      {/* Main Dashboard - Only show when data is loaded and device is online */}
+      {!loading && iotConnected && (
         <>
           {/* Header */}
           <header className="dashboard-header">
