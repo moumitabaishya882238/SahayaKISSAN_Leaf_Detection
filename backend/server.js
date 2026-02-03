@@ -19,12 +19,27 @@ connectDB();
 
 // -------------------- CORS OPTIONS --------------------
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? "https://sahayakissan.vercel.app"
-      : "http://localhost:5173",
+  origin: function (origin, callback) {
+    // Allow requests from Vercel domains or localhost
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://sahaya-kissan-leaf-detection.vercel.app/",
+    ];
+
+    // Allow all Vercel preview deployments
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type"],
+  credentials: true,
 };
 
 // -------------------- MIDDLEWARES --------------------
