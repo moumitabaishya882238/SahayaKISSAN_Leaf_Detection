@@ -1,0 +1,38 @@
+# Core FastAPI & Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+pymongo==4.6.0
+python-dotenv==1.0.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==41.0.7
+
+# LLM & AI
+langchain==0.0.350
+langchain-community==0.0.10
+ollama==0.0.15
+
+# Speech Recognition & Text-to-Speech
+openai-whisper==20231114
+SoundFile==0.12.1
+
+# Machine Learning & NLP
+numpy==1.24.3
+torch==2.0.1
+torchvision==0.15.2
+sentence-transformers==2.2.2
+Pillow==10.0.1
+
+# Vector Embeddings & RAG
+faiss-cpu==1.7.4
+pypdf==3.17.1
+
+# Utilities
+requests==2.31.0
+tqdm==4.66.1
+pydantic==2.5.0
