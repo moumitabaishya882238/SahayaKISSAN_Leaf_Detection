@@ -4,6 +4,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Layout from "./components/Layout";
 import LeafDisease from "./components/LeafDisease";
 import Home from "./pages/Home";
+import History from "./pages/History";
 import PageNotFound from "./pages/PageNotFound";
 import Splash from "./components/Splash";
 
@@ -15,6 +16,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/leaf-scan" element={<LeafDisease />} />
+          <Route path="/history" element={<History />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

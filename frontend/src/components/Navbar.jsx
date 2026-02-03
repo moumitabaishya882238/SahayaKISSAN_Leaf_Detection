@@ -14,6 +14,9 @@ export default function Navbar() {
         <Link to="/leaf-scan" className="navbar-link">
           🔬 Leaf Scan
         </Link>
+        <Link to="/history" className="navbar-link">
+          📋 History
+        </Link>
       </div>
       <div className="navbar-right">
         <button

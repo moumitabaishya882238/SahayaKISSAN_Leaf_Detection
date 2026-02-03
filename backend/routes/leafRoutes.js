@@ -54,7 +54,12 @@ router.post("/leaf/predict", upload.single("image"), async (req, res) => {
     "class_names.json",
   );
 
-  const pythonProcess = spawn("python", [
+  // Use conda environment Python
+  const pythonPath =
+    process.env.PYTHON_PATH ||
+    "D:\\Hackathon\\GUenArk\\GUenark\\SahayaKISSAN\\sahayakisan\\python.exe";
+
+  const pythonProcess = spawn(pythonPath, [
     scriptPath,
     imagePath,
     modelPath,

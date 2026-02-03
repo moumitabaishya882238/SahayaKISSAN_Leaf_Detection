@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const sensorRoutes = require("./routes/sensorRoutes");
 const leafRoutes = require("./routes/leafRoutes");
+const leafHistoryRoutes = require("./routes/leafHistoryRoutes");
 
 // -------------------- ENV SETUP --------------------
 dotenv.config();
@@ -39,6 +40,7 @@ app.get("/", (req, res) => {
 // -------------------- ROUTES --------------------
 app.use("/api-sensor", sensorRoutes);
 app.use("/api", leafRoutes);
+app.use("/api-leaf", leafHistoryRoutes);
 
 // -------------------- SERVER START --------------------
 app.listen(PORT, () => {

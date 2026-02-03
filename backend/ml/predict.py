@@ -92,7 +92,8 @@ def main():
             print("Please enter a valid tea leaf image")
             sys.exit(1)
 
-        print(label)
+        result = {"label": label, "confidence": confidence}
+        print(json.dumps(result))
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         sys.exit(1)

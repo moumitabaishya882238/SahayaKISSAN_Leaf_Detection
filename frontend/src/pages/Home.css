@@ -203,6 +203,167 @@
   margin-bottom: 32px;
 }
 
+/* Leaf Scan CTA Banner */
+.leaf-scan-banner {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(218, 165, 32, 0.15) 0%,
+    rgba(126, 227, 156, 0.15) 100%
+  );
+  border: 2px solid var(--text-accent);
+  border-radius: 20px;
+  padding: 0;
+  margin-bottom: 32px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  height: 150px;
+}
+
+.leaf-scan-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--text-accent), var(--accent-light));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.leaf-scan-banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(218, 165, 32, 0.4);
+  border-color: var(--accent-light);
+}
+
+.leaf-scan-banner:hover::before {
+  opacity: 0.08;
+}
+
+.banner-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.banner-content {
+  flex: 1;
+}
+
+.banner-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-accent);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.banner-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(218, 165, 32, 0.2);
+  border: 1px solid var(--text-accent);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.leaf-scan-banner:hover .banner-cta {
+  background: rgba(218, 165, 32, 0.3);
+  transform: translateX(4px);
+}
+
+.cta-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.banner-arrow {
+  font-size: 20px;
+  color: var(--text-accent);
+  transition: transform 0.3s ease;
+}
+
+.leaf-scan-banner:hover .banner-arrow {
+  transform: translateX(4px);
+}
+
+.banner-right {
+  width: 40%;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.leaf-scan-banner:hover .banner-image {
+  transform: scale(1.05);
+}
+
+@media (max-width: 968px) {
+  .leaf-scan-banner {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .banner-left {
+    padding: 24px 28px;
+  }
+
+  .banner-right {
+    width: 100%;
+    height: 180px;
+  }
+
+  .banner-title {
+    font-size: 22px;
+  }
+
+  .banner-icon {
+    font-size: 36px;
+  }
+}
+
 .sensor-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -897,6 +1058,103 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* Disease Risk Display */
+.modal-diseases-at-risk {
+  margin: 2px 0;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(126, 227, 156, 0.2);
+  border-radius: 3px;
+}
+
+.modal-diseases-at-risk h4 {
+  font-size: 9px;
+  color: #7ee39c;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.diseases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.disease-risk-item {
+  padding: 2px 4px;
+  border-radius: 2px;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.disease-risk-item.risk-high {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.disease-risk-item.risk-medium {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.disease-risk-item.risk-low {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.disease-risk-header {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 0;
+}
+
+.disease-emoji {
+  font-size: 11px;
+}
+
+.disease-name {
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.risk-badge {
+  padding: 1px 4px;
+  border-radius: 999px;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.risk-badge.badge-high {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.risk-badge.badge-medium {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fde68a;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+}
+
+.risk-badge.badge-low {
+  background: rgba(59, 130, 246, 0.25);
+  color: #bfdbfe;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.disease-reason {
+  font-size: 9px;
+  color: rgba(214, 233, 218, 0.7);
+  margin: 0;
+  line-height: 1.1;
+}
+
 @media (max-width: 768px) {
   .sensor-dashboard {
     padding: 24px 16px 40px;
@@ -916,5 +1174,13 @@
 
   .modal-content {
     padding: 24px;
+  }
+
+  .disease-emoji {
+    font-size: 18px;
+  }
+
+  .disease-name {
+    font-size: 13px;
   }
 }

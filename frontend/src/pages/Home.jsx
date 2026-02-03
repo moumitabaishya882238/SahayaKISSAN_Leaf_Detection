@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import scanImage from "../assets/scan.png";
 import {
   LineChart,
   Line,
@@ -109,53 +111,141 @@ export default function SensorDashboard() {
     if (!latest) return;
 
     const { temperature, humidity, soil_moisture } = latest;
+    const atRiskDiseases = [];
 
-    // Priority 1: Blister Blight (Highest Risk)
-    if (humidity > 80 && temperature >= 22 && temperature <= 28) {
-      setModalContent({
-        title: "🚨 CRITICAL: Blister Blight Risk",
-        severity: "high",
-        disease: "Blister Blight",
-        message:
-          "CRITICAL CONDITIONS DETECTED! High humidity combined with moderate temperature creates ideal conditions for Blister Blight outbreak.",
-        action: "IMMEDIATE ACTION REQUIRED within 24 hours!",
-        recommendations: [
-          "✂️ Pluck and remove infected young leaves immediately",
-          "🔥 Burn or bury infected material - DO NOT leave in field",
-          "💊 Apply Copper oxychloride or Hexaconazole fungicide",
-          "🌬️ Improve air circulation by pruning dense bushes",
-          "💧 Avoid overhead irrigation",
-          "🔄 Repeat spray after 7-10 days",
-        ],
-        currentConditions: {
-          temp: temperature,
-          humidity: humidity,
-          moisture: soil_moisture,
-        },
+    // Check Blister Blight conditions
+    // Ideal: humidity 70-80%, temp 18-25°C, moisture 40-70%
+    // HIGH RISK: humidity >90%, temp 18-25°C, moisture >70%
+    if (humidity > 85 && temperature >= 18 && temperature <= 25) {
+      const riskLevel =
+        humidity > 90 && soil_moisture > 2700
+          ? "HIGH"
+          : humidity > 87
+            ? "MEDIUM"
+            : "LOW";
+      atRiskDiseases.push({
+        name: "Blister Blight",
+        emoji: "🦠",
+        riskLevel,
+        reason: "High humidity with cool-moderate temperature",
       });
-      setShowModal(true);
     }
-    // Priority 2: Brown Blight
-    else if (
-      humidity > 75 &&
-      temperature >= 18 &&
-      temperature <= 25 &&
-      soil_moisture > 2650
+
+    // Check Brown Blight conditions
+    // Ideal: temp 24-28°C, humidity 70-80%, moisture 40-70%
+    // HIGH RISK: humidity >90%, temp 25-32°C, moisture >70%
+    if (humidity > 85 && temperature >= 24) {
+      const riskLevel =
+        humidity > 90 &&
+        temperature >= 25 &&
+        temperature <= 32 &&
+        soil_moisture > 2800
+          ? "HIGH"
+          : humidity > 87 && temperature >= 28
+            ? "MEDIUM"
+            : "LOW";
+      atRiskDiseases.push({
+        name: "Brown Blight",
+        emoji: "🍂",
+        riskLevel,
+        reason: "Warm temperature with high humidity",
+      });
+    }
+
+    // Check Leaf Red Rust conditions
+    // Thrives in: high humidity (>85%) + poor soil
+    // HIGH RISK: humidity >90%, moisture >70%
+    if (humidity > 85 && temperature >= 22 && temperature <= 30) {
+      const riskLevel =
+        humidity > 90 && soil_moisture > 2700
+          ? "HIGH"
+          : humidity > 87
+            ? "MEDIUM"
+            : "LOW";
+      atRiskDiseases.push({
+        name: "Leaf Red Rust",
+        emoji: "🍁",
+        riskLevel,
+        reason: "High humidity affecting plant health",
+      });
+    }
+
+    // Check Red Spider Mite conditions
+    // Thrives in: HOT & DRY conditions (opposite of fungi)
+    // HIGH RISK: temp >35°C, humidity <40%, moisture <2200
+    if (temperature > 33 || humidity < 40 || soil_moisture < 2300) {
+      const riskLevel =
+        temperature > 35 && humidity < 40 && soil_moisture < 2200
+          ? "HIGH"
+          : (temperature > 33 && humidity < 45) || soil_moisture < 2250
+            ? "MEDIUM"
+            : "LOW";
+      atRiskDiseases.push({
+        name: "Red Spider Mite",
+        emoji: "🕷️",
+        riskLevel,
+        reason: "Hot and dry conditions stress plants",
+      });
+    }
+
+    // Check Tea Mosquito Bug conditions
+    // Active in: warm temp 28-35°C with moderate humidity
+    // HIGH RISK: temp >33°C with humidity 50-75%
+    if (
+      temperature >= 28 &&
+      temperature <= 35 &&
+      humidity >= 50 &&
+      humidity <= 75
     ) {
+      const riskLevel =
+        temperature > 33 && humidity >= 55
+          ? "HIGH"
+          : temperature >= 31
+            ? "MEDIUM"
+            : "LOW";
+      atRiskDiseases.push({
+        name: "Tea Mosquito Bug",
+        emoji: "🦟",
+        riskLevel,
+        reason: "Warm conditions favor pest activity",
+      });
+    }
+
+    // Show alert only for HIGH or MEDIUM risk diseases
+    const significantRisks = atRiskDiseases.filter(
+      (d) => d.riskLevel === "HIGH" || d.riskLevel === "MEDIUM",
+    );
+
+    if (significantRisks.length > 0) {
+      // Find highest risk level
+      const hasHigh = significantRisks.some((d) => d.riskLevel === "HIGH");
+      const hasMedium = significantRisks.some((d) => d.riskLevel === "MEDIUM");
+
+      const overallSeverity = hasHigh ? "high" : hasMedium ? "medium" : "low";
+      const overallTitle = hasHigh
+        ? "🚨 CRITICAL: Multiple Disease Risks Detected"
+        : hasMedium
+          ? "⚠️ WARNING: Disease Risk Alert"
+          : "ℹ️ Disease Risk Advisory";
+
       setModalContent({
-        title: "⚠️ HIGH: Brown Blight Risk",
-        severity: "high",
-        disease: "Brown Blight",
-        message:
-          "Cool temperature with high humidity and excessive moisture detected. Brown Blight fungal infection likely.",
-        action: "Take action within 24-48 hours.",
+        title: overallTitle,
+        severity: overallSeverity,
+        disease: "Multiple Diseases",
+        message: `Current environmental conditions are favorable for ${significantRisks.length} disease(s). Your tea plants may be at risk.`,
+        action: hasHigh
+          ? "IMMEDIATE ACTION REQUIRED!"
+          : hasMedium
+            ? "Take preventive action within 24-48 hours"
+            : "Monitor closely and take preventive measures",
+        atRiskDiseases: significantRisks,
         recommendations: [
-          "🍂 Remove all affected leaves immediately",
-          "💧 Improve drainage - avoid water stagnation",
-          "💊 Apply Carbendazim or Mancozeb fungicide",
-          "🌿 For mild stage: Use Neem-based bio-fungicide",
-          "🔄 Repeat treatment every 10-14 days",
-          "🌱 Monitor plant closely for spread",
+          "🔍 Inspect your tea leaves carefully using the Leaf Scan feature",
+          "📸 Use OpenCV Leaf Detection to identify early symptoms",
+          "🌿 Check both upper and lower leaf surfaces",
+          "🔄 Scan multiple leaves from different bushes",
+          "📊 Compare with our disease database",
+          "💡 Get instant AI-powered diagnosis and treatment advice",
         ],
         currentConditions: {
           temp: temperature,
@@ -165,96 +255,17 @@ export default function SensorDashboard() {
       });
       setShowModal(true);
     }
-    // Priority 3: Red Rust (Nutrient Deficiency + Stress)
+    // Show optimal conditions message
     else if (
-      humidity >= 70 &&
-      humidity <= 85 &&
-      soil_moisture < 2400 &&
-      temperature >= 22
+      temperature >= 20 &&
+      temperature <= 30 &&
+      humidity >= 60 &&
+      humidity <= 75 &&
+      soil_moisture >= 2400 &&
+      soil_moisture <= 2650
     ) {
-      setModalContent({
-        title: "⚠️ MEDIUM: Red Rust Risk",
-        severity: "medium",
-        disease: "Red Rust",
-        message:
-          "Poor soil nutrition combined with stress conditions. Plants weakened and susceptible to Red Rust.",
-        action: "Address within 2-3 days to prevent spread.",
-        recommendations: [
-          "🍁 Remove heavily infected leaves",
-          "🌾 Add compost or organic manure immediately",
-          "⚗️ Apply balanced NPK fertilizer",
-          "💊 Spray copper-based fungicide or 1% Bordeaux mixture",
-          "🔄 Repeat spray every 15 days",
-          "☀️ Regulate shade levels in the field",
-        ],
-        currentConditions: {
-          temp: temperature,
-          humidity: humidity,
-          moisture: soil_moisture,
-        },
-      });
-      setShowModal(true);
-    }
-    // Priority 4: General High Humidity Warning
-    else if (humidity > 70 && temperature >= 20 && temperature <= 28) {
-      setModalContent({
-        title: "ℹ️ Elevated Disease Risk",
-        severity: "low",
-        disease: "General Alert",
-        message:
-          "Environmental conditions favor fungal disease development. Preventive action recommended.",
-        action: "Monitor closely and apply preventive measures.",
-        recommendations: [
-          "👀 Conduct daily field inspections",
-          "🌬️ Maintain good air circulation",
-          "💧 Keep drainage systems clear",
-          "🌱 Maintain regular plucking cycle",
-          "📋 Check for early disease symptoms",
-          "🛡️ Consider preventive bio-fungicide spray",
-        ],
-        currentConditions: {
-          temp: temperature,
-          humidity: humidity,
-          moisture: soil_moisture,
-        },
-      });
-      setShowModal(true);
-    }
-    // Priority 5: Extreme Conditions Warning
-    else if (soil_moisture > 2700 || soil_moisture < 2300) {
-      setModalContent({
-        title: "⚠️ Soil Moisture Alert",
-        severity: "medium",
-        disease: "Environmental Stress",
-        message:
-          soil_moisture > 2700
-            ? "Excessive soil moisture detected. Risk of root rot and fungal diseases."
-            : "Low soil moisture detected. Plant stress increases disease susceptibility.",
-        action:
-          soil_moisture > 2700
-            ? "Improve drainage immediately."
-            : "Irrigation needed within 24 hours.",
-        recommendations:
-          soil_moisture > 2700
-            ? [
-                "💧 Check and clear drainage channels",
-                "🌊 Reduce irrigation frequency",
-                "🌱 Monitor for fungal growth",
-                "🔍 Inspect roots for rot symptoms",
-              ]
-            : [
-                "💦 Irrigate field immediately",
-                "🌾 Apply mulch to retain moisture",
-                "📊 Adjust irrigation schedule",
-                "🌡️ Monitor temperature to prevent stress",
-              ],
-        currentConditions: {
-          temp: temperature,
-          humidity: humidity,
-          moisture: soil_moisture,
-        },
-      });
-      setShowModal(true);
+      // Optimal conditions - no alert needed
+      return;
     }
   };
 
@@ -300,7 +311,7 @@ export default function SensorDashboard() {
     if (type === "soil_moisture") {
       if (value < 2300 || value > 2700)
         return { text: "CRITICAL", class: "badge-critical" };
-      if (value < 2400 || value > 2650)
+      if (value < 2400 || value > 2800)
         return { text: "WARNING", class: "badge-high" };
       return null;
     }
@@ -646,6 +657,31 @@ export default function SensorDashboard() {
             </div>
           </section>
 
+          {/* Leaf Scan CTA Banner */}
+          <Link to="/leaf-scan" className="leaf-scan-banner">
+            <div className="banner-left">
+              <div className="banner-icon">🔍</div>
+              <div className="banner-content">
+                <h3 className="banner-title">Check Your Tea Leaves</h3>
+                <p className="banner-subtitle">
+                  Detect diseases early with AI-powered leaf analysis. Upload or
+                  capture leaf images for instant diagnosis.
+                </p>
+                <div className="banner-cta">
+                  <span className="cta-text">Start Scanning</span>
+                  <span className="banner-arrow">→</span>
+                </div>
+              </div>
+            </div>
+            <div className="banner-right">
+              <img
+                src={scanImage}
+                alt="Tea leaf inspection"
+                className="banner-image"
+              />
+            </div>
+          </Link>
+
           {/* Charts Section */}
           <section className="charts-section">
             {/* Temperature Line Chart */}
@@ -799,6 +835,37 @@ export default function SensorDashboard() {
                     </div>
                   </div>
                 )}
+
+                {/* Show at-risk diseases if present */}
+                {modalContent.atRiskDiseases &&
+                  modalContent.atRiskDiseases.length > 0 && (
+                    <div className="modal-diseases-at-risk">
+                      <h4>⚠️ Diseases at Risk:</h4>
+                      <div className="diseases-list">
+                        {modalContent.atRiskDiseases.map((disease, idx) => (
+                          <div
+                            key={idx}
+                            className={`disease-risk-item risk-${disease.riskLevel.toLowerCase()}`}
+                          >
+                            <div className="disease-risk-header">
+                              <span className="disease-emoji">
+                                {disease.emoji}
+                              </span>
+                              <span className="disease-name">
+                                {disease.name}
+                              </span>
+                              <span
+                                className={`risk-badge badge-${disease.riskLevel.toLowerCase()}`}
+                              >
+                                {disease.riskLevel} RISK
+                              </span>
+                            </div>
+                            <p className="disease-reason">{disease.reason}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                 <div className="modal-action">
                   <strong>Action Required:</strong> {modalContent.action}

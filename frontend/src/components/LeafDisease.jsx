@@ -27,7 +27,45 @@ export default function LeafDisease() {
     return ageSeconds < 30;
   };
 
-  // Fetch sensor data on component mount and periodically
+  // Save scan result to database
+  const saveScanToDatabase = async (
+    predictionData,
+    severityLevel,
+    advisoryData,
+    currentSensorData,
+  ) => {
+    try {
+      const payload = {
+        imageUrl: imagePreview || "",
+        imagePath: "",
+        disease: predictionData.label,
+        confidence: predictionData.confidence || 0,
+        severity: severityLevel || "MEDIUM",
+        temperature: currentSensorData?.temperature,
+        humidity: currentSensorData?.humidity,
+        soil_moisture: currentSensorData?.soil_moisture,
+        recommendations: advisoryData?.actions || [],
+      };
+
+      const response = await fetch("http://localhost:5000/api-leaf/history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        console.log("✅ Scan saved to database successfully");
+      } else {
+        console.error("❌ Failed to save scan to database");
+      }
+    } catch (err) {
+      console.error("Error saving scan to database:", err);
+    }
+  };
+
+  // Fetch sensor data on component mount and periodicallydaskjdkasjd
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
@@ -196,7 +234,10 @@ export default function LeafDisease() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        const errorMessage = data.message || data.error || "Prediction failed";
+        const errorMessage =
+          data.message ||
+          data.error ||
+          `Server error (${response.status}). Check if Python/TensorFlow is installed.`;
         throw new Error(errorMessage);
       }
 
@@ -205,6 +246,11 @@ export default function LeafDisease() {
       // Check if backend returned an error in the response
       if (data.error) {
         throw new Error(data.message || "Please enter a valid leaf image");
+      }
+
+      // Validate response
+      if (!data.label) {
+        throw new Error("Invalid response from server");
       }
 
       setResult(data);
@@ -233,6 +279,14 @@ export default function LeafDisease() {
 
             // Speak the advisory recommendations
             speakAdvisory(advisoryData, data.label, calculatedSeverity);
+
+            // Save to database
+            saveScanToDatabase(
+              data,
+              calculatedSeverity,
+              advisoryData,
+              latestSensorData,
+            );
           } else {
             setSensorData(null);
             setIotConnected(false);
@@ -246,6 +300,14 @@ export default function LeafDisease() {
           setAdvisory(advisoryData);
 
           speakAdvisory(advisoryData, data.label, calculatedSeverity);
+
+          // Save to database
+          saveScanToDatabase(
+            data,
+            calculatedSeverity,
+            advisoryData,
+            sensorData,
+          );
         }
       } catch (sensorErr) {
         console.warn(
@@ -260,6 +322,9 @@ export default function LeafDisease() {
         setAdvisory(advisoryData);
 
         speakAdvisory(advisoryData, data.label, calculatedSeverity);
+
+        // Save to database
+        saveScanToDatabase(data, calculatedSeverity, advisoryData, sensorData);
       }
     } catch (err) {
       setError(err.message || "Prediction failed");
